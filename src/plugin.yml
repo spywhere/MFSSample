@@ -1,0 +1,9 @@
+name: MFSSample
+main: me.spywhere.MFSSample.MFSSample
+version: 0.1
+description: >
+    MySQL/FlatFile Storage library sample plugin
+commands:
+  cart:
+    description: MFS Sample command
+    usage: Command not available.
