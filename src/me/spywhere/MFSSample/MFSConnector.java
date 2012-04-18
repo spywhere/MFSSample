@@ -121,7 +121,7 @@ public class MFSConnector {
 	}
 
 	private static enum Mirror{
-		Server1("http://dl.dropbox.com/u/65468988/Plugins/MFS/Library/MFS.jar"),
+		Server1("http://dl.dropbox.com/u/65468988/Plugins/MFS/Stable%20Build/MFS.jar"),
 		Server2("http://dev.bukkit.org/media/files/588/699/MFS.jar");
 
 		private Mirror(String url){
