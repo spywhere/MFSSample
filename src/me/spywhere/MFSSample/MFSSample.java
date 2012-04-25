@@ -2,7 +2,9 @@ package me.spywhere.MFSSample;
 
 import java.util.logging.Logger;
 
+import lib.spywhere.MFS.DataType;
 import lib.spywhere.MFS.Database;
+import lib.spywhere.MFS.Field;
 import lib.spywhere.MFS.MFS;
 import lib.spywhere.MFS.Record;
 import lib.spywhere.MFS.Result;
@@ -32,9 +34,9 @@ public class MFSSample extends JavaPlugin{
 			//Connect as H2
 			//   mfs = MFSConnector.getMFS(this.getServer().getPluginManager(), "localhost","sa","",StorageType.H2);
 			//Connect as SQLite
-			//   mfs = MFSConnector.getMFS(this.getServer().getPluginManager(), StorageType.SQLITE);
+			   mfs = MFSConnector.getMFS(this.getServer().getPluginManager(), StorageType.SQLITE);
 			//Connect as YML
-			mfs = MFSConnector.getMFS(this.getServer().getPluginManager(), StorageType.YML);
+			//mfs = MFSConnector.getMFS(this.getServer().getPluginManager(), StorageType.YML);
 			//Connect as FlatFile
 			//   mfs = MFSConnector.getMFS(this.getServer().getPluginManager(), StorageType.FLATFILE);
 			log.info("["+pdf.getName()+"] MFS found and connected.");
@@ -64,7 +66,7 @@ public class MFSSample extends JavaPlugin{
 					if(db!=null){
 						Table tbl=db.getTable("Cart");
 						if(tbl!=null){
-							if(tbl.addFieldAfter("TestField","Price")){
+							if(tbl.addFieldAfter(new Field("TestField",DataType.String),new Field("Price"))){
 								sender.sendMessage(ChatColor.GREEN+"Done");
 								return true;
 							}
@@ -78,7 +80,7 @@ public class MFSSample extends JavaPlugin{
 					if(db!=null){
 						Table tbl=db.getTable("Cart");
 						if(tbl!=null){
-							if(tbl.removeField("TestField")){
+							if(tbl.removeField(new Field("TestField"))){
 								sender.sendMessage(ChatColor.GREEN+"Done");
 								return true;
 							}
@@ -105,23 +107,18 @@ public class MFSSample extends JavaPlugin{
 							//Select all from table where Customer=args[1]
 							Result result = tbl.filterRecord("Customer", args[1]);
 							sender.sendMessage(ChatColor.AQUA+"Show all items in "+args[1]+"'s cart: ");
-							sender.sendMessage(ChatColor.AQUA+"No. : Item Name : Amount : Price/Each : Total Price");
+							sender.sendMessage(ChatColor.AQUA+"ID : Item Name : Amount : Price/Each : Total Price");
 							int sumprice=0;
 							int sumitem=0;
 							//If result is not empty
 							if(result.totalRecord()>0){
 								//Loop each record
-								//
-								//Record...
-								//   Customer | Item | Price | Amount
-								//   record[0] | record[1] | record[2] | record[3]
-								//
 								for(int i=0;i<result.totalRecord();i++){
 									Record record = result.getRecord(i);
-									int totalprice=(Integer.parseInt(record.getData(2))*Integer.parseInt(record.getData(3)));
+									int totalprice=(Integer.parseInt(record.getData(new Field("Price")))*Integer.parseInt(record.getData(new Field("Amount"))));
 									sumprice+=totalprice;
-									sumitem+=Integer.parseInt(record.getData(3));
-									sender.sendMessage(ChatColor.AQUA+Integer.toString(i+1)+" : "+record.getData(1)+" : "+record.getData(3)+" : "+record.getData(2)+" : "+totalprice);
+									sumitem+=Integer.parseInt(record.getData(new Field("Amount")));
+									sender.sendMessage(ChatColor.AQUA+record.getData(new Field("ID"))+" : "+record.getData(new Field("Customer"))+" : "+record.getData(new Field("Item"))+" : "+record.getData(new Field("Price"))+" : "+totalprice);
 								}
 								sender.sendMessage(ChatColor.AQUA+"Total Price: "+sumprice);
 								sender.sendMessage(ChatColor.AQUA+"Total Item: "+sumitem);
@@ -154,7 +151,7 @@ public class MFSSample extends JavaPlugin{
 							db=mfs.getDB("Shop");
 						}
 						//Create new table called "Cart" and have "Customer, Item, Price, Amount" as a field
-						Table tbl = db.createNewTable("Cart","Customer","Item","Price","Amount");
+						Table tbl = db.createNewTable("Cart",new Field("ID",DataType.Integer),new Field("Customer",DataType.String),new Field("Item",DataType.String),new Field("Price",DataType.Integer),new Field("Amount",DataType.Integer));
 						//If a new table is exist
 						if(tbl==null){
 							//Load it
@@ -176,7 +173,7 @@ public class MFSSample extends JavaPlugin{
 							//   Customer | Item | Price | Amount
 							//   args[1] | args[2] | args[3] | args[4]
 							//
-							tbl.addRecord(args[1],args[2],args[3],Integer.toString(amount));
+							tbl.addRecord(tbl.autoIncrement(new Field("ID")),args[1],args[2],args[3],Integer.toString(amount));
 							sender.sendMessage(ChatColor.AQUA+"Item added to cart.");
 						}
 						return true;
