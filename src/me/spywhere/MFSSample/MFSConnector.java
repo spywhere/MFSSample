@@ -18,23 +18,47 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.UnknownDependencyException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MFSConnector.
+ */
 public class MFSConnector {
+	
+	/** The log. */
 	private static Logger log=Logger.getLogger("Minecraft");
 
+	/** The mfs. */
 	private static MFS mfs=null;
+	
+	/** The pm. */
 	private static PluginManager pm=null;
 
+	/**
+	 * Checks if is connected.
+	 *
+	 * @return true, if is connected
+	 */
 	public static boolean isConnected(){
 		return (mfs!=null);
 	}
 
+	/**
+	 * Gets the MFS.
+	 *
+	 * @param ipm Input PluginManager
+	 * @param url Database host url
+	 * @param user Database user
+	 * @param password Database password
+	 * @param type Storage type
+	 * @return MFS
+	 */
 	static public MFS getMFS(PluginManager ipm,String url, String user, String password, StorageType type){
 		loadPlugin(ipm);
 		pm=ipm;
 		if(pm.getPlugin("MFS")!=null){
 			if(!new File("lib",type.getFileName()).exists()){
 				log.info("[MFSConnector] Downloading "+type.getName()+" library from server...");
-				if(!downloadLib(StorageType.MYSQL)){
+				if(!downloadLib(type)){
 					log.severe("[MFSConnector] Error downloading "+type.getName()+" library.");
 					return null;
 				}
@@ -47,10 +71,23 @@ public class MFSConnector {
 		return null;
 	}
 
+	/**
+	 * Gets the mFS.
+	 *
+	 * @param ipm the ipm
+	 * @param type the type
+	 * @return the mFS
+	 */
 	static public MFS getMFS(PluginManager ipm, StorageType type){
 		return getMFS(ipm,"","","",type);
 	}
 
+	/**
+	 * Download lib.
+	 *
+	 * @param type the type
+	 * @return true, if successful
+	 */
 	static private boolean downloadLib(StorageType type){
 		try {
 			if(!new File("lib",type.getFileName()).exists()){
@@ -64,6 +101,12 @@ public class MFSConnector {
 		return true;
 	}
 
+	/**
+	 * Download.
+	 *
+	 * @param time the time
+	 * @return true, if successful
+	 */
 	static private boolean download(int time){
 		try {
 			if(time>=2){return true;}
@@ -79,6 +122,11 @@ public class MFSConnector {
 		return true;
 	}
 
+	/**
+	 * Load plugin.
+	 *
+	 * @param pm the pm
+	 */
 	static private void loadPlugin(PluginManager pm){
 		if(pm.getPlugin("MFS")==null){
 			try {
@@ -97,6 +145,13 @@ public class MFSConnector {
 		}
 	}
 
+	/**
+	 * Prepare mfs.
+	 *
+	 * @param pdf the pdf
+	 * @param pm the pm
+	 * @return true, if successful
+	 */
 	static public boolean prepareMFS(PluginDescriptionFile pdf,PluginManager pm){
 		//Download all required files
 		if(!new File("plugins","MFS.jar").exists()){
@@ -120,27 +175,58 @@ public class MFSConnector {
 		return true;
 	}
 
+	/**
+	 * The Enum Mirror.
+	 */
 	private static enum Mirror{
-		Server1("http://dl.dropbox.com/u/65468988/Plugins/MFS/Stable%20Build/MFS.jar"),
+		
+		/** The Server1. */
+		Server1("http://dl.dropbox.com/u/65468988/Plugins/MFS/Stable%20Build/v0.2/MFS.jar"),
+		
+		/** The Server2. */
 		Server2("http://dev.bukkit.org/media/files/588/699/MFS.jar");
 
+		/**
+		 * Instantiates a new mirror.
+		 *
+		 * @param url the url
+		 */
 		private Mirror(String url){
 			this.url=url;
 		}
 
+		/** The url. */
 		String url;
+		
+		/**
+		 * Gets the url.
+		 *
+		 * @return the url
+		 */
 		public String getUrl() {
 			return this.url;
 		}
 	}
 
+	/** The cancelled. */
 	protected static boolean cancelled;
 
+	/**
+	 * Cancel.
+	 */
 	public synchronized void cancel()
 	{
 		cancelled = true;
 	}
 
+	/**
+	 * Download.
+	 *
+	 * @param fdr the fdr
+	 * @param location the location
+	 * @param filename the filename
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	protected static synchronized void download(String fdr,String location, String filename) throws IOException {
 		URLConnection connection = new URL(location).openConnection();
 		connection.setUseCaches(false);

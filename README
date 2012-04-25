@@ -1,5 +1,7 @@
 Sample project for MFS
 
+Current MFS version: v0.2
+
 This plugin provides a simple shopping cart system. When you have nothing in cart it will added a new one but if you already have the same item, it will update an old item.
 
 Commands:

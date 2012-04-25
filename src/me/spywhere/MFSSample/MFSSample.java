@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import lib.spywhere.MFS.Database;
 import lib.spywhere.MFS.MFS;
+import lib.spywhere.MFS.Record;
 import lib.spywhere.MFS.Result;
 import lib.spywhere.MFS.StorageType;
 import lib.spywhere.MFS.Table;
@@ -33,9 +34,9 @@ public class MFSSample extends JavaPlugin{
 			//Connect as SQLite
 			//   mfs = MFSConnector.getMFS(this.getServer().getPluginManager(), StorageType.SQLITE);
 			//Connect as YML
-			//   mfs = MFSConnector.getMFS(this.getServer().getPluginManager(), StorageType.YML);
+			mfs = MFSConnector.getMFS(this.getServer().getPluginManager(), StorageType.YML);
 			//Connect as FlatFile
-			   mfs = MFSConnector.getMFS(this.getServer().getPluginManager(), StorageType.FLATFILE);
+			//   mfs = MFSConnector.getMFS(this.getServer().getPluginManager(), StorageType.FLATFILE);
 			log.info("["+pdf.getName()+"] MFS found and connected.");
 		}else{
 			//MFS failed to download/install/run
@@ -47,7 +48,6 @@ public class MFSSample extends JavaPlugin{
 	}
 
 	public void onDisable() {
-		mfs.saveDBs();
 		log.info("["+pdf.getName()+"] v"+pdf.getVersion()+" successfully disabled.");
 	}
 
@@ -58,6 +58,36 @@ public class MFSSample extends JavaPlugin{
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
 		if(sender.isOp()){
+			if(args.length==1){
+				if(args[0].equalsIgnoreCase("demo")){
+					Database db=mfs.getDB("Shop");
+					if(db!=null){
+						Table tbl=db.getTable("Cart");
+						if(tbl!=null){
+							if(tbl.addFieldAfter("TestField","Price")){
+								sender.sendMessage(ChatColor.GREEN+"Done");
+								return true;
+							}
+						}
+					}
+					sender.sendMessage(ChatColor.GREEN+"Failed");
+					return true;
+				}
+				if(args[0].equalsIgnoreCase("demo2")){
+					Database db=mfs.getDB("Shop");
+					if(db!=null){
+						Table tbl=db.getTable("Cart");
+						if(tbl!=null){
+							if(tbl.removeField("TestField")){
+								sender.sendMessage(ChatColor.GREEN+"Done");
+								return true;
+							}
+						}
+					}
+					sender.sendMessage(ChatColor.GREEN+"Failed");
+					return true;
+				}
+			}
 			if(args.length==2){
 				if(args[0].equalsIgnoreCase("view")){
 					//Command:
@@ -87,11 +117,11 @@ public class MFSSample extends JavaPlugin{
 								//   record[0] | record[1] | record[2] | record[3]
 								//
 								for(int i=0;i<result.totalRecord();i++){
-									String[] record = result.getRecord(i);
-									int totalprice=(Integer.parseInt(record[2])*Integer.parseInt(record[3]));
+									Record record = result.getRecord(i);
+									int totalprice=(Integer.parseInt(record.getData(2))*Integer.parseInt(record.getData(3)));
 									sumprice+=totalprice;
-									sumitem+=Integer.parseInt(record[3]);
-									sender.sendMessage(ChatColor.AQUA+Integer.toString(i+1)+" : "+record[1]+" : "+record[3]+" : "+record[2]+" : "+totalprice);
+									sumitem+=Integer.parseInt(record.getData(3));
+									sender.sendMessage(ChatColor.AQUA+Integer.toString(i+1)+" : "+record.getData(1)+" : "+record.getData(3)+" : "+record.getData(2)+" : "+totalprice);
 								}
 								sender.sendMessage(ChatColor.AQUA+"Total Price: "+sumprice);
 								sender.sendMessage(ChatColor.AQUA+"Total Item: "+sumitem);
@@ -136,7 +166,7 @@ public class MFSSample extends JavaPlugin{
 						Result existitem = tbl.filterRecord("Customer", args[1]).filterBy("Item", args[2]).filterBy("Price", args[3]);
 						//If result is not empty
 						if(existitem.totalRecord()>0){
-							amount=Integer.parseInt(existitem.getRecord(0)[3]);
+							amount=Integer.parseInt(existitem.getRecord(0).getData(3));
 							amount+=Integer.parseInt(args[4]);
 							//Update Amount=amount to  all record which select from table where Customer=args[1] and Item=args[2] and Price=args[3]
 							tbl.updateRecords(tbl.filterRecord("Customer", args[1]).filterBy("Item", args[2]).filterBy("Price", args[3]), "Amount", Integer.toString(amount));
