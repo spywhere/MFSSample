@@ -118,7 +118,7 @@ public class MFSSample extends JavaPlugin{
 									int totalprice=(Integer.parseInt(record.getData(new Field("Price")))*Integer.parseInt(record.getData(new Field("Amount"))));
 									sumprice+=totalprice;
 									sumitem+=Integer.parseInt(record.getData(new Field("Amount")));
-									sender.sendMessage(ChatColor.AQUA+record.getData(new Field("ID"))+" : "+record.getData(new Field("Customer"))+" : "+record.getData(new Field("Item"))+" : "+record.getData(new Field("Price"))+" : "+totalprice);
+									sender.sendMessage(ChatColor.AQUA+record.getData(new Field("ID"))+" : "+record.getData(new Field("Item"))+" : "+record.getData(new Field("Amount"))+" : "+record.getData(new Field("Price"))+" : "+totalprice);
 								}
 								sender.sendMessage(ChatColor.AQUA+"Total Price: "+sumprice);
 								sender.sendMessage(ChatColor.AQUA+"Total Item: "+sumitem);
